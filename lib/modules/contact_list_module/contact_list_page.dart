@@ -50,7 +50,9 @@ class _ContactListPageState extends State<ContactListPage> {
         stream: _contactListBloc.state,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            showErrorMessage(Strings.somethingWentWrong);
+            WidgetsBinding.instance!.addPostFrameCallback(
+              (_) => showErrorMessage(Strings.somethingWentWrong),
+            );
           } else if (snapshot.hasData) {
             var dataSize = snapshot.data?.docs.length ?? 0;
             if (dataSize > 0) {

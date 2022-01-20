@@ -3,6 +3,7 @@ import 'package:my_contacts_app/model/contact.dart';
 import 'package:my_contacts_app/modules/contact_add_edit_module/contact_add_edit_bloc.dart';
 import 'package:my_contacts_app/modules/contact_add_edit_module/contact_add_edit_state.dart';
 import 'package:my_contacts_app/resources/strings.dart';
+import 'package:my_contacts_app/utils/helpers.dart';
 import 'package:my_contacts_app/widgets/loader.dart';
 
 class ContactAddEditPage extends StatefulWidget {
@@ -54,6 +55,10 @@ class _ContactAddEditPageState extends State<ContactAddEditPage> {
           final state = snapshot.data;
           if (state is ContactAddEditSuccess) {
             Navigator.pop(context);
+          } else if (state is Failed) {
+            WidgetsBinding.instance!.addPostFrameCallback(
+              (_) => showErrorMessage(state.message),
+            );
           }
           return Loader(
             isLoading: state is Loading,
@@ -107,7 +112,7 @@ class _ContactAddEditPageState extends State<ContactAddEditPage> {
                               ),
                             ),
                       onPressed: () {
-                        final contact = getContact();
+                        final contact = getContact(widget.contact?.id ?? "");
                         widget.contact == null
                             ? _contactAddEditBloc.addContact(contact)
                             : _contactAddEditBloc.editContact(contact);
@@ -123,8 +128,13 @@ class _ContactAddEditPageState extends State<ContactAddEditPage> {
     );
   }
 
-  Contact getContact() {
+  void showErrorMessage(String message) {
+    Alerts.showSnackBar(context, message);
+  }
+
+  Contact getContact(String id) {
     final contact = Contact(
+      id: id,
       firstName: firstNameController.text,
       lastName: lastNameController.text,
       email: emailController.text,

@@ -4,7 +4,9 @@ import 'package:my_contacts_app/modules/contact_add_edit_module/contact_add_edit
 import 'package:my_contacts_app/modules/contact_detail_module/contact_detail_bloc.dart';
 import 'package:my_contacts_app/modules/contact_detail_module/contact_detail_state.dart';
 import 'package:my_contacts_app/resources/strings.dart';
+import 'package:my_contacts_app/utils/helpers.dart';
 import 'package:my_contacts_app/widgets/loader.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ContactDetailPage extends StatefulWidget {
   final Contact contact;
@@ -49,37 +51,76 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
         stream: _contactDetailBloc.state,
         builder: (context, snapshot) {
           final state = snapshot.data;
+          if (state is ContactDeleteSuccess) {
+            Navigator.pop(context);
+          } else if (state is Failed) {
+            WidgetsBinding.instance!.addPostFrameCallback(
+              (_) => showErrorMessage(state.message),
+            );
+          }
           return Loader(
             isLoading: state is Loading,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  "${widget.contact.firstName} ${widget.contact.lastName}",
-                  style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.headline4?.fontSize,
-                    color: Colors.blue,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    "${widget.contact.firstName} ${widget.contact.lastName}",
+                    style: const TextStyle(
+                      fontSize: 30,
+                      color: Colors.blue,
+                    ),
                   ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                LocationItemView(
-                  widget.contact.city ?? "",
-                  widget.contact.state ?? "",
-                ),
-                ItemView(widget.contact.phoneNumber ?? "", Icons.phone),
-                ItemView(widget.contact.email ?? "", Icons.email),
-                DeleteContactButton(
-                  onDelete: deleteContact,
-                  contactId: widget.contact.id ?? "",
-                )
-              ],
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  LocationItemView(
+                    widget.contact.city ?? "",
+                    widget.contact.state ?? "",
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  ItemView(widget.contact.phoneNumber ?? "", Icons.phone, _makePhoneCall),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  ItemView(widget.contact.email ?? "", Icons.email, _openEmailApp),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  DeleteContactButton(
+                    onDelete: deleteContact,
+                    contactId: widget.contact.id ?? "",
+                  )
+                ],
+              ),
             ),
           );
         },
       ),
     );
+  }
+
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: phoneNumber,
+    );
+    await launch(launchUri.toString());
+  }
+
+  Future<void> _openEmailApp(String email) async {
+    final Uri launchUri = Uri(
+      scheme: 'mailto',
+      path: email,
+    );
+    await launch(launchUri.toString());
+  }
+
+  void showErrorMessage(String message) {
+    Alerts.showSnackBar(context, message);
   }
 
   void deleteContact(String id) {
@@ -111,8 +152,11 @@ class DeleteContactButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: onDelete(contactId),
-      child: const Text(Strings.deleteContact),
+      onPressed: () => onDelete(contactId),
+      child: const Text(
+        Strings.deleteContact,
+        style: TextStyle(fontSize: 22),
+      ),
     );
   }
 }
@@ -127,8 +171,8 @@ class LocationItemView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       "$city $state",
-      style: TextStyle(
-        fontSize: Theme.of(context).textTheme.headline1?.fontSize,
+      style: const TextStyle(
+        fontSize: 18,
         color: Colors.blueGrey,
       ),
     );
@@ -138,28 +182,39 @@ class LocationItemView extends StatelessWidget {
 class ItemView extends StatelessWidget {
   final String itemName;
   final IconData iconData;
+  final Function onItemClick;
 
-  const ItemView(this.itemName, this.iconData, {Key? key}) : super(key: key);
+  const ItemView(this.itemName, this.iconData, this.onItemClick, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: EdgeInsets.all(10),
-        child: Row(
-          children: [
-            Icon(
-              iconData,
-              size: 20,
-            ),
-            Text(
-              itemName,
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.headline5?.fontSize,
-                color: Colors.blue,
+    return GestureDetector(
+      onTap: () => onItemClick(itemName),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 10,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(
+                iconData,
+                size: 20,
               ),
-            ),
-          ],
+              const SizedBox(
+                width: 30,
+              ),
+              Text(
+                itemName,
+                style: const TextStyle(
+                  fontSize: 22,
+                  color: Colors.blue,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
