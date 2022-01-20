@@ -113,9 +113,8 @@ class _ContactAddEditPageState extends State<ContactAddEditPage> {
                   getPhoneNumberInfoView(),
                   getEmailInfoView(),
                   Container(
-                    margin: EdgeInsets.all(20),
-                    child: RaisedButton(
-                      padding: EdgeInsets.symmetric(vertical: 5),
+                    margin: const EdgeInsets.all(20),
+                    child: ElevatedButton(
                       child: widget.contact == null
                           ? Text(
                               Strings.addContact,

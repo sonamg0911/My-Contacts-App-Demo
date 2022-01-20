@@ -5,7 +5,7 @@ import 'package:my_contacts_app/resources/strings.dart';
 import 'modules/contact_list_module/contact_list_page.dart';
 
 void main() {
-  runApp(App());
+  runApp(const App());
 }
 
 class App extends StatelessWidget {

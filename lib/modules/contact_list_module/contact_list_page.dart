@@ -18,7 +18,7 @@ class ContactListPage extends StatefulWidget {
 class _ContactListPageState extends State<ContactListPage> {
   final ContactListBloc _contactListBloc = ContactListBloc();
 
-  var _contactList = [];
+  final _contactList = [];
 
   @override
   void dispose() {
@@ -77,7 +77,7 @@ class _ContactListPageState extends State<ContactListPage> {
             isLoading: !snapshot.hasData,
             loadingMessage: Strings.loadingContacts,
             child: Padding(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               child: ListView.separated(
                   itemCount: _contactList.length,
                   separatorBuilder: (_, __) => const Divider(height: 0.5),
@@ -134,7 +134,7 @@ class ContactListItem extends StatelessWidget {
                       color: Colors.blue,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
                   Text(
