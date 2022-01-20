@@ -75,10 +75,11 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                   const SizedBox(
                     height: 10,
                   ),
-                  LocationItemView(
-                    widget.contact.city ?? "",
-                    widget.contact.state ?? "",
-                  ),
+                  if (widget.contact.city != null || widget.contact.state != null)
+                    LocationItemView(
+                      widget.contact.city ?? "",
+                      widget.contact.state ?? "",
+                    ),
                   const SizedBox(
                     height: 20,
                   ),
@@ -86,7 +87,12 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
                   const SizedBox(
                     height: 20,
                   ),
-                  ItemView(widget.contact.email ?? "", Icons.email, _openEmailApp),
+                  if (widget.contact.email != null)
+                    ItemView(
+                      widget.contact.email ?? "",
+                      Icons.email,
+                      _openEmailApp,
+                    ),
                   const SizedBox(
                     height: 20,
                   ),
@@ -209,7 +215,7 @@ class ItemView extends StatelessWidget {
               Text(
                 itemName,
                 style: const TextStyle(
-                  fontSize: 22,
+                  fontSize: 16,
                   color: Colors.blue,
                 ),
               ),

@@ -10,4 +10,11 @@ class Strings {
   static const addContact = 'Add Contact';
   static const updateContact = 'Update Contact';
   static const somethingWentWrong = 'Something Went Wrong';
+  static const firstName = 'First Name';
+  static const lastName = 'Last Name';
+  static const city = 'City Name';
+  static const state = 'State Name';
+  static const phoneNumber = 'Phone Number';
+  static const emailId = 'Email ID';
+  static const minLength3 = 'Minimum length 3';
 }
