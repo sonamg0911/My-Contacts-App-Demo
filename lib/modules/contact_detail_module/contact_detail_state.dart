@@ -1,5 +1,7 @@
 abstract class ContactDetailState {}
 
+class Initial extends ContactDetailState {}
+
 class Loading extends ContactDetailState {}
 
 class Failed extends ContactDetailState {

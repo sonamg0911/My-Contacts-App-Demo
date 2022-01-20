@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_contacts_app/model/contact.dart';
+import 'package:my_contacts_app/modules/contact_add_edit_module/contact_add_edit_page.dart';
 import 'package:my_contacts_app/modules/contact_detail_module/contact_detail_bloc.dart';
 import 'package:my_contacts_app/modules/contact_detail_module/contact_detail_state.dart';
 import 'package:my_contacts_app/resources/strings.dart';
@@ -30,6 +31,20 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
       appBar: AppBar(
         title: const Text(Strings.contactDetail),
       ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.edit),
+        onPressed: () {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ContactAddEditPage(
+                contact: widget.contact,
+              ),
+            ),
+          );
+        },
+      ),
       body: StreamBuilder<ContactDetailState>(
         stream: _contactDetailBloc.state,
         builder: (context, snapshot) {
@@ -39,23 +54,25 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text(widget.contact.name ?? ""),
+                Text(
+                  "${widget.contact.firstName} ${widget.contact.lastName}",
+                  style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.headline4?.fontSize,
+                    color: Colors.blue,
+                  ),
+                ),
                 const SizedBox(
-                  height: 10,
+                  height: 20,
                 ),
                 LocationItemView(
                   widget.contact.city ?? "",
                   widget.contact.state ?? "",
                 ),
-                const Divider(
-                  height: 1,
-                  color: Colors.black,
-                ),
-                PhoneItemView(widget.contact.phoneNumber ?? ""),
-                EmailItemView(widget.contact.email ?? ""),
+                ItemView(widget.contact.phoneNumber ?? "", Icons.phone),
+                ItemView(widget.contact.email ?? "", Icons.email),
                 DeleteContactButton(
                   onDelete: deleteContact,
-                  contactId: widget.contact.id ?? 0,
+                  contactId: widget.contact.id ?? "",
                 )
               ],
             ),
@@ -65,14 +82,25 @@ class _ContactDetailPageState extends State<ContactDetailPage> {
     );
   }
 
-  void deleteContact(int id) {
+  void deleteContact(String id) {
     _contactDetailBloc.deleteContact(id);
+  }
+
+  void editContact(Contact contact) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ContactAddEditPage(
+          contact: contact,
+        ),
+      ),
+    );
   }
 }
 
 class DeleteContactButton extends StatelessWidget {
   final Function onDelete;
-  final int contactId;
+  final String contactId;
 
   const DeleteContactButton({
     required this.onDelete,
@@ -97,38 +125,43 @@ class LocationItemView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text("$city $state");
-  }
-}
-
-class PhoneItemView extends StatelessWidget {
-  final String phoneNumber;
-
-  const PhoneItemView(this.phoneNumber, {Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const Icon(Icons.phone),
-        Text(phoneNumber),
-      ],
+    return Text(
+      "$city $state",
+      style: TextStyle(
+        fontSize: Theme.of(context).textTheme.headline1?.fontSize,
+        color: Colors.blueGrey,
+      ),
     );
   }
 }
 
-class EmailItemView extends StatelessWidget {
-  final String email;
+class ItemView extends StatelessWidget {
+  final String itemName;
+  final IconData iconData;
 
-  const EmailItemView(this.email, {Key? key}) : super(key: key);
+  const ItemView(this.itemName, this.iconData, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const Icon(Icons.email),
-        Text(email),
-      ],
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.all(10),
+        child: Row(
+          children: [
+            Icon(
+              iconData,
+              size: 20,
+            ),
+            Text(
+              itemName,
+              style: TextStyle(
+                fontSize: Theme.of(context).textTheme.headline5?.fontSize,
+                color: Colors.blue,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

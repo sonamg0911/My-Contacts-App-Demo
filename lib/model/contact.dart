@@ -1,7 +1,7 @@
 class Contact {
-  final int? id;
-  final String? name;
-  final String? profileUrl;
+  final String? id;
+  final String? firstName;
+  final String? lastName;
   final String? email;
   final String? city;
   final String? state;
@@ -9,8 +9,8 @@ class Contact {
 
   Contact({
     this.id,
-    this.name,
-    this.profileUrl,
+    this.firstName,
+    this.lastName,
     this.email,
     this.city,
     this.state,
@@ -19,9 +19,9 @@ class Contact {
 
   factory Contact.fromJson(Map<String, dynamic> json) {
     return Contact(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      profileUrl: json['profileUrl'] as String,
+      id: json['id'] as String,
+      firstName: json['firstName'] as String,
+      lastName: json['lastName'] as String,
       email: json['email'] as String,
       city: json['city'] as String,
       state: json['state'] as String,
@@ -31,8 +31,8 @@ class Contact {
 
   Map<String, dynamic> toJson() => {
         'id': id,
-        'name': name,
-        'profileUrl': profileUrl,
+        'firstName': firstName,
+        'lastName': lastName,
         'email': email,
         'city': city,
         'state': state,

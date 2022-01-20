@@ -6,6 +6,7 @@ class Strings {
   static const loading = 'Loading';
   static const contactDetail = 'Contact Detail';
   static const deleteContact = 'Delete Contact';
+  static const editContact = 'Edit Contact';
   static const addContact = 'Add Contact';
   static const updateContact = 'Update Contact';
   static const somethingWentWrong = 'Something Went Wrong';

@@ -5,20 +5,20 @@ class DataBaseManager {
 
   static const String collectionName = "contacts";
 
-  void addContact(String firstName, String lastName, String mobileNo, String email) async {
-    await fireStoreDataBase.collection(collectionName).add({
-      'firstName': firstName,
-      'lastName': lastName,
-      'mobileNo': mobileNo,
-      'email': email,
-    });
-  }
-
-  void updateContact(String documentId, String firstName, String lastName, String mobileNo, String email) {
+  static void addContact({
+    String? firstName,
+    String? lastName,
+    String? mobileNo,
+    String? email,
+    String? city,
+    String? state,
+  }) async {
     try {
-      fireStoreDataBase.collection(collectionName).doc(documentId).update({
+      await fireStoreDataBase.collection(collectionName).add({
         'firstName': firstName,
         'lastName': lastName,
+        'city': city,
+        'state': state,
         'mobileNo': mobileNo,
         'email': email,
       });
@@ -27,7 +27,30 @@ class DataBaseManager {
     }
   }
 
-  void deleteContact(String documentId) {
+  static void updateContact(
+    String documentId, {
+    String? firstName,
+    String? lastName,
+    String? mobileNo,
+    String? email,
+    String? city,
+    String? state,
+  }) async {
+    try {
+      await fireStoreDataBase.collection(collectionName).doc(documentId).update({
+        'firstName': firstName,
+        'lastName': lastName,
+        'city': city,
+        'state': state,
+        'mobileNo': mobileNo,
+        'email': email,
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  static void deleteContact(String documentId) {
     try {
       fireStoreDataBase.collection(collectionName).doc(documentId).delete();
     } catch (e) {

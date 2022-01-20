@@ -7,11 +7,12 @@ import 'package:rxdart/rxdart.dart';
 class ContactDetailBloc extends Bloc {
   final _dataRepository = DataRepository();
 
-  final _state = BehaviorSubject<ContactDetailState>.seeded(Loading());
+  final _state = BehaviorSubject<ContactDetailState>.seeded(Initial());
 
   Stream<ContactDetailState> get state => _state.stream;
 
-  Future<void> deleteContact(int id) async {
+  Future<void> deleteContact(String id) async {
+    _state.add(Loading());
     try {
       await _dataRepository.deleteContact(id);
       _state.add(ContactDeleteSuccess());

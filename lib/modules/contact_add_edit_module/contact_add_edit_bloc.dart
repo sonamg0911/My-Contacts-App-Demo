@@ -8,11 +8,12 @@ import 'package:rxdart/rxdart.dart';
 class ContactAddEditBloc extends Bloc {
   final _dataRepository = DataRepository();
 
-  final _state = BehaviorSubject<ContactAddEditState>.seeded(Loading());
+  final _state = BehaviorSubject<ContactAddEditState>.seeded(Initial());
 
   Stream<ContactAddEditState> get state => _state.stream;
 
   Future<void> editContact(Contact contact) async {
+    _state.add(Loading());
     try {
       await _dataRepository.editContact(contact);
       _state.add(ContactAddEditSuccess());
@@ -22,6 +23,7 @@ class ContactAddEditBloc extends Bloc {
   }
 
   Future<void> addContact(Contact contact) async {
+    _state.add(Loading());
     try {
       await _dataRepository.addContact(contact);
       _state.add(ContactAddEditSuccess());

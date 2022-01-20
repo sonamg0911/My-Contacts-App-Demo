@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:my_contacts_app/model/contact.dart';
+import 'package:my_contacts_app/modules/contact_add_edit_module/contact_add_edit_page.dart';
+import 'package:my_contacts_app/modules/contact_detail_module/contact_detail_page.dart';
 import 'package:my_contacts_app/modules/contact_list_module/contact_list_bloc.dart';
 import 'package:my_contacts_app/resources/strings.dart';
 import 'package:my_contacts_app/utils/helpers.dart';
@@ -25,36 +27,62 @@ class _ContactListPageState extends State<ContactListPage> {
     super.dispose();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(Strings.myContacts),
       ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ContactAddEditPage(),
+            ),
+          ).then((value) {
+            setState(() {});
+          });
+        },
+      ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _contactListBloc.state,
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const NoContactsView();
-          } else if (snapshot.hasError) {
+          if (snapshot.hasError) {
             showErrorMessage(Strings.somethingWentWrong);
           } else if (snapshot.hasData) {
-            //do conversion from snapshot to Contact list
-            //_contactList = state.contacts;
+            var dataSize = snapshot.data?.docs.length ?? 0;
+            if (dataSize > 0) {
+              _contactList.clear();
+              snapshot.data?.docs.forEach((document) {
+                var contact = Contact(
+                  id: document.id,
+                  firstName: document.get('firstName'),
+                  lastName: document.get('lastName'),
+                  email: document.get('email'),
+                  state: document.get('state'),
+                  city: document.get('city'),
+                  phoneNumber: document.get('mobileNo'),
+                );
+                _contactList.add(contact);
+              });
+            } else {
+              return const NoContactsView();
+            }
           }
           return Loader(
             isLoading: !snapshot.hasData,
             loadingMessage: Strings.loadingContacts,
-            child: ListView.separated(
-                itemCount: _contactList.length,
-                separatorBuilder: (context, index) {
-                  return const Divider(
-                    height: 2,
-                    color: Colors.black,
-                  );
-                },
-                itemBuilder: (context, index) {
-                  return ContactListItem(_contactList.elementAt(index));
-                }),
+            child: Padding(
+              padding: EdgeInsets.all(10),
+              child: ListView.separated(
+                  itemCount: _contactList.length,
+                  separatorBuilder: (_, __) => const Divider(height: 0.5),
+                  itemBuilder: (context, index) {
+                    return ContactListItem(_contactList.elementAt(index));
+                  }),
+            ),
           );
         },
       ),
@@ -73,14 +101,56 @@ class ContactListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Icon(Icons.phone),
-          Text(contact.name ?? ""),
-        ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ContactDetailPage(
+              contact,
+            ),
+          ),
+        );
+      },
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 15,
+            horizontal: 20,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "${contact.firstName} ${contact.lastName}",
+                    style: TextStyle(
+                      fontSize: Theme.of(context).textTheme.headline5?.fontSize,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.blue,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    contact.phoneNumber ?? "",
+                    style: TextStyle(fontSize: Theme.of(context).textTheme.headline6?.fontSize),
+                  ),
+                ],
+              ),
+              Text(
+                "${contact.city}",
+                style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.headline6?.fontSize,
+                  color: Colors.blueGrey,
+                ),
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -97,7 +167,7 @@ class NoContactsView extends StatelessWidget {
       alignment: Alignment.center,
       child: Text(
         Strings.noContacts,
-        style: TextStyle(fontSize: Theme.of(context).textTheme.headline4?.fontSize),
+        style: TextStyle(fontSize: Theme.of(context).textTheme.headline6?.fontSize),
       ),
     );
   }
